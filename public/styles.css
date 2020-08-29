@@ -1,0 +1,93 @@
+.widthHeight100 {
+    width : 100%;
+    height: 100%;
+}
+
+.maxWidthHeight100 {
+    max-width : 100%;
+    max-height: 100%;
+}
+
+.row-max-width-height {
+    max-width : 70%;
+    max-height: 70%;
+    clear: both
+}
+.row-max-width-height.flexbox {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+.show-images {
+    width              : 20%;
+    text-align         : center;
+}
+
+.show-images img {
+    max-width: 70% !important;    
+    vertical-align: middle;
+}
+.show-images img.filled {
+    max-width: 90% !important;    
+    vertical-align: middle;
+}
+video {
+    border-radius: 10px;
+}
+
+.card-title {
+    font-weight: 400 !important;
+    /* color   : darkblue; */
+}
+
+.disable-click {
+    pointer-events  : none;
+    background-color: grey !important;
+}
+
+.right-capture-indicate {
+    position        : absolute;
+    right           : 0px;
+    top             : calc(50% - 15px);
+    width           : 26px;
+    height          : 26px;
+    background-color: #90CAF9;
+}
+
+.left-capture-indicate {
+    position        : absolute;
+    top             : calc(50% - 15px);
+    width           : 26px;
+    height          : 26px;
+    background-color: #90CAF9;
+}
+
+.top-capture-indicate {
+    position        : absolute;
+    right           : calc(50% - 15px);
+    top             : 0px;
+    width           : 26px;
+    height          : 26px;
+    background-color: #90CAF9;
+}
+
+.bottom-capture-indicate {
+    position        : absolute;
+    right           : calc(50% - 15px);
+    bottom          : 5px;
+    width           : 26px;
+    height          : 26px;
+    background-color: #90CAF9;
+}
+
+.front-capture-indicate {
+    position: absolute;
+    right   : calc(50% - 15px);
+    top     : 50%;
+    width   : 26px;
+    height  : 26px;
+}
+
+.front-capture-indicate i {
+    color: #90CAF9;
+}
