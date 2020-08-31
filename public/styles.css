@@ -54,6 +54,7 @@ video {
     width           : 26px;
     height          : 26px;
     background-color: #90CAF9;
+	z-index: 99;
 }
 
 .left-capture-indicate {
@@ -62,6 +63,7 @@ video {
     width           : 26px;
     height          : 26px;
     background-color: #90CAF9;
+	z-index: 99;
 }
 
 .top-capture-indicate {
@@ -71,6 +73,7 @@ video {
     width           : 26px;
     height          : 26px;
     background-color: #90CAF9;
+	z-index: 99;
 }
 
 .bottom-capture-indicate {
@@ -80,6 +83,7 @@ video {
     width           : 26px;
     height          : 26px;
     background-color: #90CAF9;
+	z-index: 99;
 }
 
 .front-capture-indicate {
@@ -88,10 +92,17 @@ video {
     top     : 50%;
     width   : 26px;
     height  : 26px;
+	z-index: 99;
 }
 
 .front-capture-indicate i {
     color: #90CAF9;
+}
+
+video{
+  transform: rotateY(180deg);
+  -webkit-transform:rotateY(180deg); / Safari and Chrome /
+  -moz-transform:rotateY(180deg); / Firefox /
 }
 
 @media only screen and (max-width: 600px) {
