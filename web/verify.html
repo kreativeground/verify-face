@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/materialize.css">
+  <link rel="stylesheet" href="css/toastr.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+  <div class="page-container" style="display: flex; flex-direction: column;height:100%">
+    <div class="row row-max-width-height" style="flex:3">
+      <div class="card blue lighten-3 z-depth-5">
+        <div class="center">
+          <span class="card-title">Verify it.</span>
+        </div>
+        <video onloadedmetadata="onPlay(this)" id="inputVideo" width="100%" autoplay muted
+            playsinline></video>
+        <div class="card-action center">
+          <a class="btn-floating btn-large waves-effect waves-light disable-click" id="takeScreenshot">
+            <i class="material-icons large">center_focus_strong</i>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="row row-max-width-height flexbox" style="flex:1">
+      <form id="savebutton" action="javascript:;" style="display: flex; align-items: flex-end">
+        <div id="front-capture" class="show-images" style="flex: 1">
+          <img src="img/face.png" alt="front capture" />
+        </div>
+        <div class="input-field" style="flex: 2">
+          <input id="email" type="email" autocomplete="off" style="margin-bottom: 0px" class="validate" required>
+          <label for="email" style="margin-top: 8px; color: darkblue;">Email</label>
+        </div>
+        <div class="input-field" style="flex: 1">
+          <button class="btn waves-effect waves-light blue" type="save">
+            Save
+            <i class="material-icons right">send</i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+  <script src="js/materialize.min.js"></script>
+  <script src="js/toastr.min.js"></script>
+  <script src="js/face-api.js"></script>
+  <script src="js/commons.js"></script>
+  <script src="js/faceDetectionControls.js"></script>
+</body>
+
+<script>
+  toastr.options = {
+    "closeButton": false,
+    "debug": false,
+    "newestOnTop": false,
+    "progressBar": false,
+    "positionClass": "toast-top-right",
+    "preventDuplicates": false,
+    "onclick": null,
+    "showDuration": "300",
+    "hideDuration": "1000",
+    "timeOut": "5000",
+    "extendedTimeOut": "1000",
+    "showEasing": "swing",
+    "hideEasing": "linear",
+    "showMethod": "fadeIn",
+    "hideMethod": "fadeOut"
+  }
+  async function onPlay() {
+    const videoEl = $('#inputVideo').get(0)
+
+    if (videoEl.paused || videoEl.ended || !isFaceDetectionModelLoaded())
+      return setTimeout(() => onPlay(), 200)
+
+    const options = getFaceDetectorOptions()
+    const result = await faceapi.detectSingleFace(videoEl, options)
+    if (result) {
+      $("#takeScreenshot").removeAttr("title").removeClass("disable-click");
+    } else {
+      $("#takeScreenshot").attr("title", "Kindly keep closer the face.").addClass("disable-click");
+    }
+    setTimeout(() => onPlay(), 200)
+  }
+
+  $(document).on("click", "#takeScreenshot", function () {
+    const vEl = $('#inputVideo').get(0)
+    const cn = document.createElement('canvas');
+    cn.width = vEl.videoWidth;
+    cn.height = vEl.videoHeight;
+    
+	var context = cn.getContext('2d');
+	context.translate(cn.width, 0);
+	context.scale(-1, 1);
+	context.drawImage(vEl, 10, 10);
+
+    const img = document.createElement("img");
+    img.className = "square responsive-img widthHeight100 filled";
+    var imgUrl = cn.toDataURL('image/webp');
+    img.src = imgUrl;
+    document.getElementById("front-capture").innerHTML = "";
+    document.getElementById("front-capture").appendChild(img);
+  })
+  $("#savebutton").submit(function () {
+    const isValidEmail = $("#savebutton")[0].checkValidity();
+    if (isValidEmail) {
+      var email = $(this).find("[type=email]").val();
+      var params = {
+        "emailAddress": email,
+        "FIndex": "",
+        "mode": "FACE",
+        "flag": "A",
+        "deviceInfo": "",
+        "lat": "0.0",
+        "lng": "0.0",
+        "AppMode": "ADD",
+        "AppName": "webEnroll",
+        "DeviceCode": "",
+        "tmpl1": $("#front-capture img").attr("src")
+      };
+      sendImages(params)
+    }
+  });
+  async function sendImages(params) {
+    $.ajax({
+      url: "https://mybiodentity.com/finger/fprint.asmx?op=SaveFPrint",
+      method: "POST",
+      data: params,
+      success: function (data) {
+        if (data.status == 200) {
+          toastr.success(data.message ? data.message : "Successfully uploaded.");
+        } else {
+          toastr.error(data.message, data.status);
+        }
+      },
+      error: function (jqXHR, exception) {
+        toastr.error(jqXHR.statusText, jqXHR.status);
+      }
+    });
+  }
+
+  async function run() {
+    // load face detection model
+    await changeFaceDetector(TINY_FACE_DETECTOR)
+    changeInputSize(128)
+
+    // try to access users webcam and stream the images
+    // to the video element
+    const stream = await navigator.mediaDevices.getUserMedia({ video: {} })
+    const videoEl = $('#inputVideo').get(0)
+    videoEl.srcObject = stream;
+  }
+
+  function updateResults() { }
+
+  $(document).ready(function () {
+    initFaceDetectionControls()
+    run()
+    $("video").attr({height: ($(window).height() - $(".flexbox").height() - 150)});
+  })
+</script>
+</body>
+
+</html>
